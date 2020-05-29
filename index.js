@@ -197,7 +197,7 @@ module.exports = class TorrentRSS {
       // Remove incorrect sources
       feed = feed.filter(
         (entry) =>
-          !!entry.source || entry.source.toLowerCase() === settings.source.toLowerCase() ||
+          (!!entry.source && entry.source.toLowerCase() === settings.source.toLowerCase()) ||
           settings.source === ''
       );
 
