@@ -353,7 +353,7 @@ module.exports = class TorrentRSS {
   }
 
   updateStatsForShow(show, downloadInfo) {
-    const idx = this.statistics.findIndex((stat) => stat.name === show.name);
+    const idx = this.statistics.findIndex((stat) => stat.name === show);
     const match = idx === -1 ? false : true;
 
     /** @type {ShowStatistic} */
