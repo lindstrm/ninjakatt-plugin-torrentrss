@@ -43,6 +43,7 @@ module.exports = class TorrentRSS {
 
   subscriptions() {
     this.subscribe('torrentrss.add-show', this.actOnAddedShow);
+    this.subscribe('torrentrss.get-rss', this.actOnGetRSS);
     this.subscribe('qbittorrent.download-complete', this.actOnDownloadComplete);
   }
 
@@ -60,6 +61,13 @@ module.exports = class TorrentRSS {
     this.addShow(show, source);
     return Promise.resolve(this.settings.shows);
   };
+
+  actOnGetRSS = ({ plugin }) => {
+    this.emit(
+      'torrentrss.rss-list',
+      this.settings.feeds
+    );
+  }
 
   actOnDownloadComplete = async (torrent) => {
     const showInfo = ptt.parse(torrent.name);
@@ -173,6 +181,16 @@ module.exports = class TorrentRSS {
           title: this.cleanName(entry.title),
           savePath: this.getSavePath(entry),
         }));
+
+      // Emit feed items
+      this.emit(
+        'torrentrss.feed-items',
+        {
+          feedDomain: feedDomain,
+          feedUrl: feedUrl,
+          feedItems: feed
+        }
+      );
 
       // Remove files already downloaded
       feed = feed.filter(
@@ -396,19 +414,22 @@ module.exports = class TorrentRSS {
 
   addShow(show, source) {
     let newShows = 0;
-    if (Array.isArray(show)) {
-      show = show.map((s) => this.cleanName(s));
-      show = show.map((s) => this.getShow(s));
-      show = show.filter((s) => this.settings.shows.indexOf(s) === -1);
-      show = show.filter((s) => !this.removedShows.includes(s));
+    if (!Array.isArray(show)) {
+      show = [show];
+    }
+    show = show.map((s) => this.cleanName(s));
+    show = show.map((s) => this.getShow(s));
+    show = show.filter((s) => this.settings.shows.indexOf(s) === -1);
+    show = show.filter((s) => !this.removedShows.includes(s));
 
-      if (show.length === 0) {
-        return;
-      }
+    if (show.length === 0) {
+      return;
+    }
 
-      this.settings.shows = [...this.settings.shows, ...show];
-      newShows = show.map((s) => s.Name).join(', ');
-    } else if (!this.removedShows.map((s) => s.name).includes(show)) {
+    this.settings.shows = [...this.settings.shows, ...show];
+    newShows = show.map((s) => s.Name).join(', ');
+
+    if (!this.removedShows.map((s) => s.name).includes(show)) {
       newShows = typeof show === 'string' ? show : show.name;
       this.settings.shows.push(this.getShow(show));
     }
