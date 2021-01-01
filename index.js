@@ -80,7 +80,7 @@ module.exports = class TorrentRSS {
       (s) => this.cleanName(s.name) === this.cleanName(showInfo.title)
     );
 
-    if (!show) {
+    if (!show || (show.name && !show.name.length)) {
       this.logDiag('Downloaded torrent is not a show, aborting.');
       return;
     }
@@ -371,6 +371,7 @@ module.exports = class TorrentRSS {
   }
 
   updateStatsForShow(show, downloadInfo) {
+    if (!show || !show.length) { return }
     const idx = this.statistics.findIndex((stat) => stat.name === show);
     const match = idx === -1 ? false : true;
 
