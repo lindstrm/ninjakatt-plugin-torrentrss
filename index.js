@@ -415,6 +415,9 @@ module.exports = class TorrentRSS {
 
   addShow(show, source) {
     let newShows = 0;
+    if (!show || show.length === '0') {
+      return;
+    }
     if (!Array.isArray(show)) {
       show = [show];
     }
