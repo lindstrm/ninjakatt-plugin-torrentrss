@@ -165,7 +165,14 @@ module.exports = class TorrentRSS {
 
     feeds.forEach(async (feedUrl) => {
       const feedDomain = extractRootDomain(feedUrl);
-      let feed = await rss.parseURL(feedUrl);
+      let feed;
+
+      try {
+        feed = await rss.parseURL(feedUrl);
+      } catch (e) {
+        console.log('Couldnt get feed; ', feedUrl);
+        return;
+      }
 
       // Add info to entries
       feed = feed.items
@@ -395,9 +402,9 @@ module.exports = class TorrentRSS {
   }
 
   getShowsWithStats(shows) {
-    return shows.map((show) => {
+    return shows.filter(x => x.name).map((show) => {
       const downloads = (
-        this.statistics.find((s) => s.name === show.name) || {
+        this.statistics.find((s) => s.name.toLowerCase() === show.name.toLowerCase()) || {
           downloads: [],
         }
       ).downloads;
