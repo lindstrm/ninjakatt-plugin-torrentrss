@@ -80,7 +80,7 @@ module.exports = class TorrentRSS {
       (s) => this.cleanName(s.name) === this.cleanName(showInfo.title)
     );
 
-    if (!show || (show.name && !show.name.length)) {
+    if (!show || !show.name || (show.name && !show.name.length)) {
       this.logDiag('Downloaded torrent is not a show, aborting.');
       return;
     }
@@ -421,8 +421,8 @@ module.exports = class TorrentRSS {
   }
 
   addShow(show, source) {
-    let newShows = 0;
-    if (!show || show.length === '0') {
+    let newShows;
+    if (!show || show.length === 0) {
       return;
     }
     if (!Array.isArray(show)) {
@@ -430,15 +430,15 @@ module.exports = class TorrentRSS {
     }
     show = show.map((s) => this.cleanName(s));
     show = show.map((s) => this.getShow(s));
-    show = show.filter((s) => this.settings.shows.indexOf(s) === -1);
-    show = show.filter((s) => !this.removedShows.includes(s));
+    show = show.filter((s) => this.settings.shows.findIndex(y => y.name === s.name) === -1);
+    show = show.filter((s) => this.removedShows.findIndex(y => y.name === s.name) === -1);
 
     if (show.length === 0) {
       return;
     }
 
     this.settings.shows = [...this.settings.shows, ...show];
-    newShows = show.map((s) => s.Name).join(', ');
+    newShows = show.map((s) => s.name).join(', ');
 
     if (!this.removedShows.map((s) => s.name).includes(show)) {
       newShows = typeof show === 'string' ? show : show.name;
