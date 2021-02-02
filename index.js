@@ -398,6 +398,8 @@ module.exports = class TorrentRSS {
       this.statistics[idx] = showStat;
     }
 
+    this.statistics = this.statistics.filter(x => !!x.name);
+
     this.writeFile(this.file('statistics.json'), this.statistics);
   }
 
