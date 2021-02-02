@@ -373,7 +373,7 @@ module.exports = class TorrentRSS {
     this.statistics = this.readFile(this.file('statistics.json')) || [];
 
     if (this.statistics.length) {
-      this.statistics = this.statistics.map((show) => new ShowStatistic(show));
+      this.statistics = this.statistics.filter(x => !!x.name).map((show) => new ShowStatistic(show));
     }
   }
 
