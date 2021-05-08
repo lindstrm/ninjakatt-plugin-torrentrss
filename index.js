@@ -508,7 +508,7 @@ module.exports = class TorrentRSS {
     if (settings.sort == false) {
       dir = `${settings.saveTo}`;
     } else {
-      dir = `${settings.saveTo}\\${entry.title}`;
+      dir = `${settings.saveTo}${path.sep}${entry.title}`;
     }
     return dir;
   }
